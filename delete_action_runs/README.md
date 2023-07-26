@@ -17,6 +17,7 @@ Run Debug on VSCode as NodeJS.
 **clone**
 
 ```sh
+cd delete_action_run
 npm ci
 code .
 ```
