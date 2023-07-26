@@ -1,13 +1,16 @@
 const { Octokit } = require("@octokit/rest");
-const token = "YOUR_GITHUB_PAT" // need workflow permission
+
+const token = "YOUR_GITHUB_PAT" // fine-grained token - required permission: workflow `Read and write`
+const owner = "NAME_OR_ORG";
+const repo = "REPO_NAME";
+const workflowId = "WORKFLOW_FILE_NAME.yaml";
+
+let done = false;
+const dryRun = false; // true: dryrun, false: delete
+
 const octokit = new Octokit({
     auth: token,
 });
-
-const owner = "NAME_OR_ORG";
-const repo = "REPO_NAME";
-const workflowId = "WORKFLOW_ID";
-let done = false;
 
 (async () => {
     // list your workflow ids
@@ -32,9 +35,11 @@ let done = false;
         // delete run_ids.
         console.log(`There are total ${runs.data.total_count} runs.`)
         if (runs.data.total_count != 0) {
-            console.log(`deleting runs for .`)
             for (const item of runs.data.workflow_runs) {
-                console.log(`deleting ${item.id}.`)
+                console.log(`${dryRun ? '(dryrun) ' : ''}deleting runs for runId: ${item.id}.`)
+                if (dryRun) {
+                    continue;
+                }
                 await octokit.rest.actions.deleteWorkflowRun({
                     owner: owner,
                     repo: repo,
